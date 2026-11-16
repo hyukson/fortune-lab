@@ -1,9 +1,20 @@
 .home {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 32px;
   padding: 32px 16px;
+}
+
+.home-logo {
+  margin: 0;
+  line-height: 0;
+}
+.home-logo img {
+  width: min(280px, 70vw);
+  height: auto;
 }
 
 .home-grid {

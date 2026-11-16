@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
 import './HomePage.css';
 
 // 메인 페이지: 헤더 없이 기능 카드 4개만 배치
@@ -13,6 +14,9 @@ const MENUS = [
 export default function HomePage() {
   return (
     <main className="home">
+      <h1 className="home-logo">
+        <img src={logo} alt="운세연구소" />
+      </h1>
       <div className="home-grid">
         {MENUS.map((menu) => (
           <Link key={menu.to} to={menu.to} className="home-card">
