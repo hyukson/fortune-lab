@@ -1,0 +1,42 @@
+.home {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.home-grid {
+  width: 100%;
+  max-width: 720px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.home-card {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.home-card:hover {
+  border-color: var(--color-gold);
+  transform: translateY(-2px);
+}
+.home-card h2 {
+  margin: 0 0 6px;
+  color: var(--color-gold);
+}
+.home-card p {
+  margin: 0;
+  color: var(--color-sub);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 560px) {
+  .home-grid {
+    grid-template-columns: 1fr;
+  }
+}

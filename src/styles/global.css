@@ -1,0 +1,60 @@
+@import './theme.css';
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font);
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 공통 버튼: 금색 → hover 시 밝은 금색 */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-bg);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.btn:hover {
+  background: var(--color-gold-hover);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 기능 페이지 공통 틀 (PageLayout 컴포넌트에서 사용) */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+.page-title {
+  color: var(--color-gold);
+  margin: 8px 0;
+}
+.page-desc {
+  color: var(--color-sub);
+  margin: 0 0 24px;
+}
+.back-link {
+  color: var(--color-sub);
+  font-size: 0.9rem;
+}
+.back-link:hover {
+  color: var(--color-text);
+}
