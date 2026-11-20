@@ -1,0 +1,257 @@
+/* 손금 페이지 전용 스타일 — 클래스는 모두 palm- 으로 시작, 색은 theme.css 변수만 사용 */
+
+.palm-card {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  margin-bottom: 20px;
+}
+
+.palm-card-title {
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+  color: var(--color-text);
+}
+
+.palm-tips {
+  margin: 0 0 20px;
+  padding-left: 20px;
+  color: var(--color-sub);
+}
+
+.palm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+/* 파일 선택 input은 숨기고 라벨(버튼)을 누르게 */
+.palm-upload input {
+  display: none;
+}
+
+/* 보조 버튼: 테두리만 금색 */
+.btn.palm-btn-sub {
+  background: transparent;
+  color: var(--color-gold);
+  box-shadow: inset 0 0 0 2px var(--color-gold);
+}
+.btn.palm-btn-sub:hover {
+  color: var(--color-gold-hover);
+  box-shadow: inset 0 0 0 2px var(--color-gold-hover);
+  background: transparent;
+}
+
+.palm-sub-text {
+  color: var(--color-sub);
+  font-size: 0.85rem;
+  margin: 8px 0 0;
+}
+
+.palm-error-text {
+  color: var(--color-gold);
+  font-weight: 700;
+  margin: 0;
+}
+
+/* ---------- 분석 중 ---------- */
+.palm-status {
+  text-align: center;
+}
+.palm-status .palm-actions {
+  justify-content: center;
+}
+
+.palm-spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  border: 4px solid var(--color-bg);
+  border-top-color: var(--color-gold);
+  animation: palm-spin 0.9s linear infinite;
+}
+
+@keyframes palm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- 카메라 ---------- */
+.palm-camera-frame {
+  position: relative;
+  max-width: 560px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.palm-camera-frame video {
+  display: block;
+  width: 100%;
+  transform: scaleX(-1); /* 거울처럼 보이게 */
+}
+
+.palm-camera-guide {
+  position: absolute;
+  inset: 12% 28%;
+  border: 2px dashed var(--color-text);
+  border-radius: 40px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ---------- 결과 ---------- */
+.palm-result {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+}
+
+.palm-kicker {
+  margin: 0;
+  color: var(--color-sub);
+  font-size: 0.9rem;
+}
+
+.palm-type {
+  margin: 4px 0 20px;
+  color: var(--color-gold);
+  font-size: 1.6rem;
+}
+
+.palm-result-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .palm-result-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.palm-canvas canvas {
+  display: block;
+  max-width: 100%;
+  height: auto !important;
+  border-radius: 12px;
+}
+
+.palm-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.palm-line-card {
+  background: var(--color-bg);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.palm-line-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  color: var(--color-text);
+}
+
+.palm-line-card h3 small {
+  color: var(--color-sub);
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+
+.palm-line-card p {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+}
+
+.palm-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+.palm-dot--life {
+  background: var(--color-gold);
+}
+.palm-dot--head {
+  background: var(--color-sub);
+}
+.palm-dot--heart {
+  background: var(--color-text);
+}
+
+.palm-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.palm-badge {
+  font-size: 0.78rem;
+  padding: 2px 10px;
+  border-radius: 999px;
+  color: var(--color-gold);
+  box-shadow: inset 0 0 0 1px var(--color-gold);
+}
+
+/* ---------- 계산 방법 ---------- */
+.palm-method {
+  margin-top: 20px;
+  color: var(--color-text);
+}
+
+.palm-method summary {
+  cursor: pointer;
+  color: var(--color-gold);
+  font-weight: 700;
+}
+
+.palm-method ol {
+  padding-left: 20px;
+  font-size: 0.9rem;
+}
+
+.palm-table-wrap {
+  overflow-x: auto;
+}
+
+.palm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.palm-table th,
+.palm-table td {
+  padding: 6px 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--color-bg);
+}
+
+.palm-table th {
+  color: var(--color-sub);
+  font-weight: 400;
+}
+
+.palm-note {
+  margin: 20px 0 0;
+  color: var(--color-sub);
+  font-size: 0.85rem;
+}
+
+.palm-credit {
+  margin: 4px 0 0;
+  color: var(--color-sub);
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
