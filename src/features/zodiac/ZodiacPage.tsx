@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import PageLayout from '../../components/PageLayout';
 import DownloadButton from '../download/DownloadButton';
 import { formatDate, getDailyRanking, getFortune, todayString, type Fortune, type Scores } from './fortune';
+import NightSky from './NightSky';
 import { getSignById } from './signs';
 import {
   clearHistory,
@@ -153,6 +154,9 @@ export default function ZodiacPage() {
 
             <p className="zodiac-notice">엔터테인먼트 목적의 콘텐츠입니다.</p>
           </section>
+
+          {/* 밤하늘에서 빛나는 내 별자리 (p5.js) */}
+          <NightSky sign={fortune.sign} />
 
           <Comparison fortune={fortune} previous={previous} />
 
