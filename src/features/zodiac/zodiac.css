@@ -183,7 +183,7 @@
 /* 분야별 운세 */
 .zodiac-areas {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   margin: 0;
   padding: 0;
@@ -260,7 +260,7 @@
 
 /* ---------- 밤하늘 (p5 캔버스) ---------- */
 .zodiac-sky {
-  margin: 16px 0 0;
+  margin: 24px 0 0;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--color-gold) 25%, transparent);
   border-radius: var(--radius);
@@ -278,8 +278,15 @@
   text-align: center;
 }
 .zodiac-sky-caption strong {
+  font-family: 'Black Han Sans', var(--font);
+  font-weight: 400;
+  font-size: 1.2rem;
+}
+.zodiac-sky-guide {
+  margin-top: 4px;
+  color: var(--color-sub);
   font-family: 'Gowun Batang', serif;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
 }
 
 /* ---------- 순위 변동 배지 ---------- */
@@ -414,5 +421,11 @@
   }
   .zodiac-row-comment {
     display: none; /* 좁은 화면에서는 코멘트 숨김 */
+  }
+}
+
+@media (max-width: 640px) {
+  .zodiac-areas {
+    grid-template-columns: 1fr; /* 좁은 화면에서는 분야별 운세를 한 줄에 하나씩 */
   }
 }

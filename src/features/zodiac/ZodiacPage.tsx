@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import PageLayout from '../../components/PageLayout';
 import DownloadButton from '../download/DownloadButton';
 import { formatDate, getDailyRanking, getFortune, todayString, type Fortune, type Scores } from './fortune';
-import NightSky from './NightSky';
+import ZodiacSky from './ZodiacSky';
 import { getSignById } from './signs';
 import {
   clearHistory,
@@ -90,6 +90,9 @@ export default function ZodiacPage() {
 
       {fortune && (
         <>
+          {/* 밤하늘에서 빛나는 내 별자리 + 볼 수 있는 방향 (p5.js) */}
+          <ZodiacSky sign={fortune.sign} date={fortune.date} />
+
           {/* 이 영역이 이미지로 저장됩니다 (DownloadButton targetId) */}
           <section id="zodiac-result" className="zodiac-result">
             <p className="zodiac-eyebrow">Today's Horoscope</p>
@@ -154,9 +157,6 @@ export default function ZodiacPage() {
 
             <p className="zodiac-notice">엔터테인먼트 목적의 콘텐츠입니다.</p>
           </section>
-
-          {/* 밤하늘에서 빛나는 내 별자리 (p5.js) */}
-          <NightSky sign={fortune.sign} />
 
           <Comparison fortune={fortune} previous={previous} />
 

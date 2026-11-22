@@ -7,25 +7,25 @@ export type ZodiacSign = {
   id: string; // 영어 이름 (저장·계산용)
   name: string; // 한국어 이름
   latin: string; // 영어(라틴어) 이름
-  symbol: string; // 별자리 기호
+  symbol: string; // 별자리 기호 (기호 뒤에 보이지 않는 문자 U+FE0E를 붙여 이모지 대신 글자 모양으로 보이게 함)
   period: string; // 화면에 보여줄 기간
   start: [number, number]; // 시작 [월, 일]
 };
 
 // 순서: 양자리부터 시작 (start 날짜 순서대로 정렬되어 있어야 getSign이 올바르게 동작)
 export const SIGNS: ZodiacSign[] = [
-  { id: 'aries', name: '양자리', latin: 'Aries', symbol: '♈', period: '3.21 ~ 4.19', start: [3, 21] },
-  { id: 'taurus', name: '황소자리', latin: 'Taurus', symbol: '♉', period: '4.20 ~ 5.20', start: [4, 20] },
-  { id: 'gemini', name: '쌍둥이자리', latin: 'Gemini', symbol: '♊', period: '5.21 ~ 6.21', start: [5, 21] },
-  { id: 'cancer', name: '게자리', latin: 'Cancer', symbol: '♋', period: '6.22 ~ 7.22', start: [6, 22] },
-  { id: 'leo', name: '사자자리', latin: 'Leo', symbol: '♌', period: '7.23 ~ 8.22', start: [7, 23] },
-  { id: 'virgo', name: '처녀자리', latin: 'Virgo', symbol: '♍', period: '8.23 ~ 9.22', start: [8, 23] },
-  { id: 'libra', name: '천칭자리', latin: 'Libra', symbol: '♎', period: '9.23 ~ 10.22', start: [9, 23] },
-  { id: 'scorpio', name: '전갈자리', latin: 'Scorpio', symbol: '♏', period: '10.23 ~ 11.21', start: [10, 23] },
-  { id: 'sagittarius', name: '사수자리', latin: 'Sagittarius', symbol: '♐', period: '11.22 ~ 12.21', start: [11, 22] },
-  { id: 'capricorn', name: '염소자리', latin: 'Capricorn', symbol: '♑', period: '12.22 ~ 1.19', start: [12, 22] },
-  { id: 'aquarius', name: '물병자리', latin: 'Aquarius', symbol: '♒', period: '1.20 ~ 2.18', start: [1, 20] },
-  { id: 'pisces', name: '물고기자리', latin: 'Pisces', symbol: '♓', period: '2.19 ~ 3.20', start: [2, 19] },
+  { id: 'aries', name: '양자리', latin: 'Aries', symbol: '♈︎', period: '3.21 ~ 4.19', start: [3, 21] },
+  { id: 'taurus', name: '황소자리', latin: 'Taurus', symbol: '♉︎', period: '4.20 ~ 5.20', start: [4, 20] },
+  { id: 'gemini', name: '쌍둥이자리', latin: 'Gemini', symbol: '♊︎', period: '5.21 ~ 6.21', start: [5, 21] },
+  { id: 'cancer', name: '게자리', latin: 'Cancer', symbol: '♋︎', period: '6.22 ~ 7.22', start: [6, 22] },
+  { id: 'leo', name: '사자자리', latin: 'Leo', symbol: '♌︎', period: '7.23 ~ 8.22', start: [7, 23] },
+  { id: 'virgo', name: '처녀자리', latin: 'Virgo', symbol: '♍︎', period: '8.23 ~ 9.22', start: [8, 23] },
+  { id: 'libra', name: '천칭자리', latin: 'Libra', symbol: '♎︎', period: '9.23 ~ 10.22', start: [9, 23] },
+  { id: 'scorpio', name: '전갈자리', latin: 'Scorpio', symbol: '♏︎', period: '10.23 ~ 11.21', start: [10, 23] },
+  { id: 'sagittarius', name: '사수자리', latin: 'Sagittarius', symbol: '♐︎', period: '11.22 ~ 12.21', start: [11, 22] },
+  { id: 'capricorn', name: '염소자리', latin: 'Capricorn', symbol: '♑︎', period: '12.22 ~ 1.19', start: [12, 22] },
+  { id: 'aquarius', name: '물병자리', latin: 'Aquarius', symbol: '♒︎', period: '1.20 ~ 2.18', start: [1, 20] },
+  { id: 'pisces', name: '물고기자리', latin: 'Pisces', symbol: '♓︎', period: '2.19 ~ 3.20', start: [2, 19] },
 ];
 
 /**
