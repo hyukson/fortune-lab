@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import PageLayout from '../../components/PageLayout';
+import { saveFaceResult } from '../chatbot/adapters/saveFace';
 import { analyzeFace } from './core/analyze';
 import { fileToCanvas } from './core/image';
 import { findFaces } from './core/faceCount';
@@ -78,6 +79,7 @@ export default function FacePage() {
     if (stale()) return;
     if (import.meta.env.DEV) (window as unknown as { __face?: Analysis }).__face = analysis;
 
+    if (analysis.ok) saveFaceResult(analysis.reading); // AI 운세 상담에서 쓰도록 결과 저장 (김예진 추가, src/features/chatbot 참고)
     if (analysis.ok) setStep({ name: 'scan', image, analysis });
     else setStep({ name: 'retry', image, issues: analysis.issues, quality: analysis.quality });
   }

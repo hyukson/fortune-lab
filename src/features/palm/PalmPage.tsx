@@ -1,6 +1,7 @@
 import { useMemo, useState, type ChangeEvent } from 'react';
 import PageLayout from '../../components/PageLayout';
 import P5Canvas from '../../components/P5Canvas';
+import { savePalmResult } from '../chatbot/adapters/savePalm';
 import DownloadButton from '../download/DownloadButton';
 import { analyzePalm, AnalyzeError, fileToCanvas, type PalmResult } from './analyzePalm';
 import CameraCapture from './CameraCapture';
@@ -31,6 +32,7 @@ export default function PalmPage() {
     setStage('analyzing');
     try {
       const r = await analyzePalm(image, setMessage);
+      savePalmResult(r); // AI 운세 상담에서 쓰도록 결과 저장 (김예진 추가, src/features/chatbot 참고)
       setResult(r);
       setStage('result');
     } catch (e) {

@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import PageLayout from '../../components/PageLayout';
+import { saveFortuneResult } from '../chatbot/resultStore';
 import DownloadButton from '../download/DownloadButton';
 import { formatDate, getDailyRanking, getFortune, todayString, type Fortune, type Scores } from './fortune';
 import ZodiacSky from './ZodiacSky';
@@ -63,6 +64,25 @@ export default function ZodiacPage() {
     setHistory(saveRecord({ date, birth, signId: result.sign.id, rank: result.rank }));
     saveLastBirth(birth);
     setFortune(result);
+
+    // AI 운세 상담에서 쓸 수 있도록 결과 보관함에 저장 (src/features/chatbot/README.md 참고)
+    saveFortuneResult({
+      kind: 'zodiac',
+      title: `${result.sign.name} · ${formatDate(result.date)} ${result.rank}위`,
+      summary: `${result.headline}. ${result.message}`,
+      topics: {
+        love: result.areaMessages.love,
+        money: result.areaMessages.money,
+        career: result.areaMessages.study,
+        health: result.areaMessages.health,
+      },
+      scores: {
+        love: result.scores.love,
+        money: result.scores.money,
+        career: result.scores.study,
+        health: result.scores.health,
+      },
+    });
   }
 
   function handleClearHistory() {

@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import PageLayout from '../../components/PageLayout';
 import P5Canvas from '../../components/P5Canvas';
+import { saveTarotResult } from '../chatbot/adapters/saveTarot';
 import { DECK } from './deck';
 import {
   POSITION_LABELS,
@@ -78,6 +79,7 @@ export default function TarotPage() {
         getInitial: () => sessionRef.current!,
         onChange: (next) => {
           saveSession(next);
+          if (next.phase === 'done') saveTarotResult(next); // AI 운세 상담에서 쓰도록 결과 저장 (김예진 추가, src/features/chatbot 참고)
           setSession(next);
         },
         reducedMotion: prefersReducedMotion(),

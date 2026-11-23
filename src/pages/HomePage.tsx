@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
 import StarField from '../components/StarField';
+import ChatbotSection from '../features/chatbot/ChatbotSection'; // AI 운세 상담 (김예진)
 import './HomePage.css';
 
 // 메인 페이지: 헤더 없이 기능 카드 4개만 배치
@@ -76,6 +77,7 @@ export default function HomePage() {
           </Link>
         ))}
       </div>
+      <ChatbotSection />
       <p className="home-note">모든 분석은 브라우저 안에서만 이루어져요 · 엔터테인먼트 목적의 콘텐츠입니다</p>
     </main>
   );
