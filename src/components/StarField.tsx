@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
 
-// 메인 페이지 배경: 반짝이는 별 + 천천히 나타났다 사라지는 별자리 + 가끔 별똥별
-// p5는 용량이 커서(약 1MB) 메인 페이지에서는 브라우저 기본 캔버스로만 그립니다.
+// 사이트 공통 배경: 반짝이는 별 + 천천히 나타났다 사라지는 별자리 + 가끔 별똥별
+// - 메인 페이지: <StarField />  (별자리까지 전부)
+// - 기능 페이지: <StarField subtle />  (PageLayout이 자동으로 깔아줌. 별만 더 희미하게)
+// p5는 용량이 커서(약 1MB) 브라우저 기본 캔버스로만 그립니다.
 // 색은 theme.css 변수를 읽어서 씁니다 (HEX 직접 사용 X).
 
 type RGB = [number, number, number];
@@ -33,7 +35,7 @@ function cssColor(name: string, fallback: RGB): RGB {
 }
 const rgba = ([r, g, b]: RGB, a: number) => `rgba(${r},${g},${b},${a})`;
 
-export default function StarField() {
+export default function StarField({ subtle = false }: { subtle?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -43,6 +45,7 @@ export default function StarField() {
     const TEXT = cssColor('--color-text', [247, 238, 223]);
     const GOLD = cssColor('--color-gold', [235, 196, 123]);
     const SUB = cssColor('--color-sub', [201, 181, 211]);
+    const dim = subtle ? 0.55 : 1; // 기능 페이지에서는 내용이 잘 보이게 희미하게
 
     let w = 0;
     let h = 0;
@@ -61,7 +64,7 @@ export default function StarField() {
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.round((w * h) / 5000);
+      const count = Math.round((w * h) / (subtle ? 8000 : 5000));
       stars = Array.from({ length: count }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
@@ -95,12 +98,12 @@ export default function StarField() {
         const tw = reduced ? 1 : 0.6 + 0.4 * Math.sin(t * s.speed + s.phase);
         const x = s.x + mouse.x * s.depth * 14;
         const y = s.y + mouse.y * s.depth * 14;
-        ctx.fillStyle = rgba(s.gold ? GOLD : TEXT, s.base * tw);
+        ctx.fillStyle = rgba(s.gold ? GOLD : TEXT, s.base * tw * dim);
         ctx.beginPath();
         ctx.arc(x, y, s.r, 0, Math.PI * 2);
         ctx.fill();
         if (s.r > 1.2) {
-          ctx.fillStyle = rgba(s.gold ? GOLD : TEXT, 0.06 * tw);
+          ctx.fillStyle = rgba(s.gold ? GOLD : TEXT, 0.06 * tw * dim);
           ctx.beginPath();
           ctx.arc(x, y, s.r * 4, 0, Math.PI * 2);
           ctx.fill();
@@ -109,7 +112,7 @@ export default function StarField() {
 
       // 별자리: 선이 그어지며 나타났다가 서서히 사라짐
       constellations = constellations.filter((c) => now - c.start < CONST_LIFE);
-      if (constellations.length < 2 && (constellations.length === 0 || now - constellations[0].start > CONST_LIFE / 2)) {
+      if (!subtle && constellations.length < 2 && (constellations.length === 0 || now - constellations[0].start > CONST_LIFE / 2)) {
         spawnConstellation(now);
       }
       for (const c of constellations) {
@@ -146,12 +149,12 @@ export default function StarField() {
         const speed = 9 + Math.random() * 5;
         const ang = Math.PI * (0.15 + Math.random() * 0.15);
         meteor = { x: Math.random() * w * 0.8, y: Math.random() * h * 0.3, vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed, life: 1 };
-        nextMeteor = now + 6000 + Math.random() * 8000;
+        nextMeteor = now + (subtle ? 14000 : 6000) + Math.random() * 8000;
       }
       if (meteor) {
         const m = meteor;
         const grad = ctx.createLinearGradient(m.x, m.y, m.x - m.vx * 10, m.y - m.vy * 10);
-        grad.addColorStop(0, rgba(TEXT, 0.8 * m.life));
+        grad.addColorStop(0, rgba(TEXT, 0.8 * m.life * dim));
         grad.addColorStop(1, rgba(TEXT, 0));
         ctx.strokeStyle = grad;
         ctx.lineWidth = 1.4;
@@ -188,5 +191,5 @@ export default function StarField() {
     };
   }, []);
 
-  return <canvas ref={ref} className="home-stars" aria-hidden="true" />;
+  return <canvas ref={ref} className="site-stars" aria-hidden="true" />;
 }
