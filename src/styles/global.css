@@ -25,6 +25,7 @@ a {
   border-radius: 999px;
   background: var(--color-gold);
   color: var(--color-bg);
+  font-family: inherit;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
@@ -57,4 +58,14 @@ a {
 }
 .back-link:hover {
   color: var(--color-text);
+}
+
+/* 사이트 공통 별 배경 (components/StarField.tsx) — 내용 뒤에 고정 */
+.site-stars {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
 }

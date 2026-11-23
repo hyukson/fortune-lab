@@ -65,6 +65,11 @@ function loadModel(): Promise<LoadedModel> {
   return modelPromise;
 }
 
+/** 카메라 화면에 들어갈 때 미리 불러 두기 (첫 손금 확인이 빨라짐) */
+export function preloadSegmenter(): void {
+  loadModel().catch(() => {});
+}
+
 export async function segmentPalmLines(image: HTMLCanvasElement): Promise<SegmentResult> {
   const { ort, session, names } = await loadModel();
   const size = INPUT_SIZE;

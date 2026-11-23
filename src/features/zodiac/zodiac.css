@@ -1,0 +1,431 @@
+/*
+ * 별자리 운세 페이지 스타일 (담당: 김예진)
+ * 팀 규칙: 색은 theme.css 변수만 사용, 클래스명은 zodiac- 으로 시작
+ * [AI 사용 표시] Claude(AI)가 작성 (AI 사용 비율: 약 100%)
+ *
+ * 글씨체 (구글 폰트 — 이 CSS는 별자리 페이지에서만 불러오므로 다른 페이지에 영향 없음)
+ *  - Black Han Sans : 순위 숫자 · 별자리 이름 (굵은 제목체)
+ *  - Gowun Batang   : 운세 멘트 · 조언 · 행운 정보 (감성 명조체)
+ *  - Gaegu          : 순위표 한 줄 코멘트 (손글씨체)
+ *  - Cinzel         : 영문 장식 라벨 (클래식 서체)
+ */
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Cinzel:wght@500;700&family=Gaegu:wght@400;700&family=Gowun+Batang:wght@400;700&display=swap');
+
+/* ---------- 공통 글씨체 묶음 ---------- */
+.zodiac-rank,
+.zodiac-sign-name,
+.zodiac-row-rank,
+.zodiac-row-name,
+.zodiac-section-title,
+.zodiac-subtitle {
+  font-family: 'Black Han Sans', var(--font);
+  font-weight: 400; /* Black Han Sans는 원래 굵은 글씨라 400으로 사용 */
+}
+.zodiac-headline,
+.zodiac-message,
+.zodiac-area p,
+.zodiac-advice,
+.zodiac-lucky-item strong {
+  font-family: 'Gowun Batang', serif;
+}
+.zodiac-row-comment,
+.zodiac-hint {
+  font-family: 'Gaegu', var(--font);
+}
+.zodiac-eyebrow,
+.zodiac-subtitle span {
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+/* ---------- 입력 폼 ---------- */
+.zodiac-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 20px;
+  background: var(--color-card);
+  border-radius: var(--radius);
+}
+.zodiac-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 180px;
+  color: var(--color-sub);
+  font-size: 0.9rem;
+}
+.zodiac-field input {
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--color-sub) 40%, transparent);
+  border-radius: 10px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 1rem;
+  color-scheme: dark; /* 달력 아이콘을 밝은 색으로 */
+}
+.zodiac-field input:focus {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 1px;
+}
+.zodiac-error {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-gold);
+}
+
+/* ---------- 결과 카드 (이미지로 저장되는 영역) ---------- */
+.zodiac-result {
+  margin-top: 24px;
+  padding: 32px 28px;
+  background: var(--color-card);
+  border: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+  border-radius: var(--radius);
+  animation: zodiac-appear 0.5s ease-out;
+}
+@keyframes zodiac-appear {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zodiac-result { animation: none; }
+}
+
+.zodiac-eyebrow {
+  margin: 0;
+  color: var(--color-gold);
+  font-size: 0.75rem;
+}
+.zodiac-date {
+  margin: 2px 0 0;
+  color: var(--color-sub);
+  font-size: 0.9rem;
+}
+
+.zodiac-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  margin: 18px 0 8px;
+}
+.zodiac-symbol {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-gold) 15%, transparent);
+  color: var(--color-gold);
+  font-size: 2.6rem;
+  line-height: 1;
+}
+.zodiac-sign-name {
+  margin: 0;
+  font-size: 1.8rem;
+  line-height: 1.2;
+}
+.zodiac-sign-period {
+  margin: 0;
+  color: var(--color-sub);
+  font-size: 0.85rem;
+}
+.zodiac-rank-box {
+  margin-left: auto;
+  text-align: right;
+}
+.zodiac-rank {
+  margin: 0;
+  color: var(--color-gold);
+  font-size: 4rem;
+  line-height: 1;
+}
+.zodiac-rank small {
+  margin-left: 4px;
+  font-size: 1.4rem;
+}
+.zodiac-yesterday {
+  margin: 6px 0 0;
+  color: var(--color-sub);
+  font-size: 0.85rem;
+}
+
+.zodiac-headline {
+  margin: 24px 0 8px;
+  color: var(--color-gold);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.zodiac-message {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.zodiac-subtitle {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 32px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-gold) 25%, transparent);
+  font-size: 1.1rem;
+}
+.zodiac-subtitle span {
+  color: var(--color-gold);
+  font-size: 0.7rem;
+}
+
+/* 분야별 운세 */
+.zodiac-areas {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.zodiac-area {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--color-bg);
+}
+.zodiac-area-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.zodiac-area-label {
+  font-weight: 700;
+}
+.zodiac-area-label span {
+  color: var(--color-gold);
+}
+.zodiac-area p {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+.zodiac-stars {
+  color: var(--color-gold);
+  letter-spacing: 2px;
+}
+
+/* 오늘의 조언 */
+.zodiac-advice {
+  margin: 0;
+  padding: 16px 18px;
+  border-left: 3px solid var(--color-gold);
+  border-radius: 0 12px 12px 0;
+  background: color-mix(in srgb, var(--color-gold) 8%, transparent);
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+/* 오늘의 행운 */
+.zodiac-lucky {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.zodiac-lucky-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--color-bg);
+}
+.zodiac-lucky-item span {
+  color: var(--color-sub);
+  font-size: 0.8rem;
+}
+.zodiac-lucky-item strong {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.zodiac-notice {
+  margin: 24px 0 0;
+  color: var(--color-sub);
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+/* ---------- 밤하늘 (p5 캔버스) ---------- */
+.zodiac-sky {
+  margin: 24px 0 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-gold) 25%, transparent);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+}
+.zodiac-sky-canvas canvas {
+  display: block;
+}
+.zodiac-sky-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 14px 16px 18px;
+  text-align: center;
+}
+.zodiac-sky-caption strong {
+  font-family: 'Black Han Sans', var(--font);
+  font-weight: 400;
+  font-size: 1.2rem;
+}
+.zodiac-sky-guide {
+  margin-top: 4px;
+  color: var(--color-sub);
+  font-family: 'Gowun Batang', serif;
+  font-size: 0.95rem;
+}
+
+/* ---------- 순위 변동 배지 ---------- */
+.zodiac-change {
+  color: var(--color-sub);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.zodiac-change.is-up {
+  color: var(--color-gold);
+}
+.zodiac-change.is-down {
+  color: var(--color-sub);
+  opacity: 0.75;
+}
+
+/* ---------- 비교 · 버튼 ---------- */
+.zodiac-compare {
+  margin: 16px 0 0;
+  color: var(--color-sub);
+}
+.zodiac-compare strong {
+  color: var(--color-text);
+}
+.zodiac-actions {
+  margin-top: 16px;
+}
+
+/* ---------- 순위표 · 기록 ---------- */
+.zodiac-section {
+  margin-top: 48px;
+}
+.zodiac-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.zodiac-section-title {
+  margin: 2px 0 14px;
+  font-size: 1.4rem;
+}
+.zodiac-text-btn {
+  margin-bottom: 14px;
+  border: none;
+  background: none;
+  color: var(--color-sub);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.zodiac-text-btn:hover {
+  color: var(--color-text);
+}
+
+.zodiac-ranking {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.zodiac-row {
+  display: grid;
+  grid-template-columns: 32px 28px 88px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--color-card);
+}
+.zodiac-row.is-mine {
+  outline: 2px solid var(--color-gold);
+}
+.zodiac-row-rank {
+  color: var(--color-gold);
+  font-size: 1.3rem;
+  text-align: center;
+}
+.zodiac-row-symbol {
+  color: var(--color-gold);
+  font-size: 1.2rem;
+}
+.zodiac-row-name {
+  font-size: 1.05rem;
+}
+.zodiac-row-comment {
+  color: var(--color-sub);
+  font-size: 1.1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.zodiac-row-change {
+  font-size: 0.85rem;
+  text-align: right;
+}
+.zodiac-hint {
+  margin: 10px 0 0;
+  color: var(--color-sub);
+  font-size: 1rem;
+}
+
+.zodiac-history {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.zodiac-history li {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  padding: 8px 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-sub) 20%, transparent);
+  color: var(--color-sub);
+}
+.zodiac-history strong {
+  color: var(--color-text);
+}
+
+/* ---------- 휴대폰 화면 ---------- */
+@media (max-width: 520px) {
+  .zodiac-result {
+    padding: 24px 18px;
+  }
+  .zodiac-rank-box {
+    margin-left: 0;
+    flex-basis: 100%;
+    text-align: left;
+  }
+  .zodiac-row {
+    grid-template-columns: 26px 22px 1fr auto;
+  }
+  .zodiac-row-comment {
+    display: none; /* 좁은 화면에서는 코멘트 숨김 */
+  }
+}
+
+@media (max-width: 640px) {
+  .zodiac-areas {
+    grid-template-columns: 1fr; /* 좁은 화면에서는 분야별 운세를 한 줄에 하나씩 */
+  }
+}

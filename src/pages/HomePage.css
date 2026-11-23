@@ -5,49 +5,197 @@
   align-items: center;
   justify-content: center;
   gap: 32px;
-  padding: 32px 16px;
+  padding: 48px 16px;
 }
 
 .home-logo {
   margin: 0;
   line-height: 0;
+  animation: home-rise 0.9s ease-out both;
 }
 .home-logo img {
   width: min(280px, 70vw);
   height: auto;
+  filter: drop-shadow(0 0 28px color-mix(in srgb, var(--color-gold) 22%, transparent));
 }
 
 .home-grid {
   width: 100%;
-  max-width: 720px;
+  max-width: 760px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 
+/* 카드: 반투명 배경(뒤 별이 살짝 비침) + hover 시 금빛 테두리와 빛 */
 .home-card {
-  background: var(--color-card);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 24px 22px;
   border-radius: var(--radius);
-  padding: 28px 24px;
-  border: 1px solid transparent;
-  transition: border-color 0.2s, transform 0.2s;
+  background: color-mix(in srgb, var(--color-card) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-gold) 14%, transparent);
+  backdrop-filter: blur(3px);
+  overflow: hidden;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  animation: home-rise 0.7s ease-out both;
 }
-.home-card:hover {
-  border-color: var(--color-gold);
-  transform: translateY(-2px);
+/* 위쪽 가장자리의 은은한 금빛 줄 */
+.home-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 18% auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-gold) 55%, transparent), transparent);
+  opacity: 0.5;
+  transition: opacity 0.25s;
+}
+.home-card:hover,
+.home-card:focus-visible {
+  border-color: color-mix(in srgb, var(--color-gold) 70%, transparent);
+  transform: translateY(-3px);
+  box-shadow:
+    0 10px 30px color-mix(in srgb, var(--color-bg) 70%, transparent),
+    0 0 24px color-mix(in srgb, var(--color-gold) 16%, transparent);
+  outline: none;
+}
+.home-card:hover::before {
+  opacity: 1;
+}
+
+.home-icon {
+  flex: none;
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--color-gold);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-gold) 14%, transparent), transparent 70%);
+  border: 1px solid color-mix(in srgb, var(--color-gold) 25%, transparent);
+  transition: transform 0.4s, background 0.25s;
+}
+.home-card:hover .home-icon {
+  transform: rotate(-6deg) scale(1.06);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-gold) 26%, transparent), transparent 70%);
+}
+.home-icon svg {
+  width: 38px;
+  height: 38px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.home-icon .home-icon-thin {
+  stroke-width: 1.2;
+  stroke: var(--color-sub);
+}
+.home-icon .home-icon-dash {
+  stroke-width: 0.8;
+  stroke: var(--color-sub);
+  stroke-dasharray: 2 3;
+  opacity: 0.6;
+}
+.home-icon .home-icon-dot {
+  fill: currentColor;
+  stroke: none;
+}
+.home-icon .home-icon-fill {
+  fill: var(--color-card);
+}
+
+.home-text {
+  flex: 1;
+  min-width: 0;
 }
 .home-card h2 {
-  margin: 0 0 6px;
+  margin: 0 0 4px;
   color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: 0.02em;
 }
 .home-card p {
   margin: 0;
   color: var(--color-sub);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
 }
 
+.home-arrow {
+  color: var(--color-gold);
+  font-size: 1.2rem;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s, transform 0.25s;
+}
+.home-card:hover .home-arrow {
+  opacity: 1;
+  transform: none;
+}
+
+.home-note {
+  margin: 0;
+  color: var(--color-sub);
+  font-size: 0.8rem;
+  opacity: 0.7;
+  text-align: center;
+  word-break: keep-all;
+  animation: home-rise 0.7s 0.6s ease-out both;
+}
+
+@keyframes home-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* 모바일: 2×2로 작게 → 카드 4개가 첫 화면에 다 보이게 */
 @media (max-width: 560px) {
+  .home {
+    gap: 24px;
+    padding: 32px 16px;
+  }
+  .home-logo img {
+    width: min(220px, 60vw);
+  }
   .home-grid {
-    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .home-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+    padding: 20px 12px;
+  }
+  .home-icon {
+    width: 52px;
+    height: 52px;
+  }
+  .home-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+  .home-card h2 {
+    font-size: 1.1rem;
+  }
+  .home-card p {
+    font-size: 0.78rem;
+    word-break: keep-all;
+  }
+  .home-arrow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-logo,
+  .home-card,
+  .home-note {
+    animation: none;
   }
 }

@@ -13,5 +13,6 @@
   --color-sub: #c9b5d3;         /* 짧은 설명 · 보조 메뉴 */
 
   --radius: 16px;
-  --font: 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+  --font: 'Pretendard Variable', 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+  --font-display: 'Gowun Batang', 'Noto Serif KR', serif; /* 제목·강조용 명조체 */
 }
