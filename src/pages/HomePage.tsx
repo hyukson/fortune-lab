@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
+import StarField from './StarField';
 import './HomePage.css';
 
 // 메인 페이지: 헤더 없이 기능 카드 4개만 배치
@@ -14,6 +15,7 @@ const MENUS = [
 export default function HomePage() {
   return (
     <main className="home">
+      <StarField />
       <h1 className="home-logo">
         <img src={logo} alt="운세연구소" />
       </h1>
