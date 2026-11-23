@@ -5,6 +5,7 @@
 // [AI 사용 표시] 이 파일의 코드는 Claude(AI)가 함수 단위로 작성했습니다. (AI 사용 비율: 약 100%)
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import PageLayout from '../../components/PageLayout';
 import P5Canvas from '../../components/P5Canvas';
 import { DECK } from './deck';
@@ -18,6 +19,7 @@ import {
   type TarotSession,
   type Topic,
 } from './storage';
+import { previewSketch } from './previewSketch';
 import { createTarotSketch } from './tarotSketch';
 import './TarotPage.css';
 
@@ -61,6 +63,8 @@ export default function TarotPage() {
   const [topic, setTopic] = useState<Topic>(session?.topic ?? 'love');
   const [question, setQuestion] = useState('');
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [searchParams] = useSearchParams();
+  const isPreview = searchParams.has('preview'); // #/tarot?preview=1 이면 카드 디자인 미리보기
 
   // p5 스케치가 "최신 세션"을 읽을 수 있도록 ref에 항상 담아 둠
   const sessionRef = useRef(session);
@@ -141,6 +145,18 @@ export default function TarotPage() {
   function discard() {
     clearSession();
     setSession(null);
+  }
+
+  // ── (개발용) 카드 디자인 미리보기 ──
+  if (isPreview) {
+    return (
+      <div className="tarot-stage">
+        <P5Canvas sketch={previewSketch} />
+        <Link to="/tarot" className="tarot-ghost-btn tarot-preview-close">
+          닫기
+        </Link>
+      </div>
+    );
   }
 
   // ── ② 카드 화면 (p5 전체화면 캔버스 + 위쪽 버튼 줄) ──

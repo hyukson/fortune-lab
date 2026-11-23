@@ -135,7 +135,7 @@ export function drawCrescent(p: p5, x: number, y: number, r: number, glow: boole
   const ox = x + r * 0.42;
   const oy = y - r * 0.2;
   const or = r * 0.86;
-  ctx.save();
+  p.push(); // p5 push = 캔버스 save + p5 스타일 저장
   ctx.beginPath();
   ctx.arc(x, y, r, 0, TAU);
   ctx.clip();
@@ -145,7 +145,7 @@ export function drawCrescent(p: p5, x: number, y: number, r: number, glow: boole
   ctx.arc(ox, oy, or, 0, TAU);
   ctx.fillStyle = `rgb(${PALETTE.goldHover.join(',')})`;
   ctx.fill('evenodd');
-  ctx.restore();
+  p.pop(); // 잘라내기(clip)·색 설정 원상복구
 }
 
 /**

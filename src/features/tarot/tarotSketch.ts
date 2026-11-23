@@ -14,8 +14,9 @@
 import type p5 from 'p5';
 import { createNebula, drawCelestialWheel, drawSparkle } from './celestial';
 import { DECK, DECK_SIZE, createShuffledDeck } from './deck';
-import { drawCardBack, drawCardFront, drawStar, fitText } from './drawCard';
-import { PALETTE } from './palette';
+import { drawCardBack, drawCardFront, fitText } from './drawCard';
+import { CANVAS_FONT, PALETTE } from './palette';
+import { drawStar } from './symbols';
 import { POSITION_LABELS, type TarotSession } from './storage';
 
 type SketchOptions = {
@@ -160,7 +161,7 @@ export function createTarotSketch(opts: SketchOptions) {
     p.setup = () => {
       const cnv = p.createCanvas(p.windowWidth, p.windowHeight);
       canvasEl = cnv.elt as HTMLCanvasElement;
-      p.textFont('Pretendard, "Noto Sans KR", system-ui, sans-serif');
+      p.textFont(CANVAS_FONT);
       p.rectMode(p.CENTER);
       L = computeLayout(p.width, p.height);
       stars = Array.from({ length: 160 }, () => ({
@@ -478,7 +479,7 @@ export function createTarotSketch(opts: SketchOptions) {
       const ctx = p.drawingContext as CanvasRenderingContext2D;
       const clipL = L.gridLeft - 12;
       const clipR = L.gridLeft + L.usedW + 12;
-      ctx.save();
+      p.push(); // p5 push = 캔버스 save + p5 스타일 저장
       ctx.beginPath();
       ctx.rect(clipL, L.gridTop - 6, clipR - clipL, L.gridBottom - L.gridTop);
       ctx.clip(); // 카드 영역 밖(화살표 쪽)으로 삐져나온 카드는 안 보이게 자르기
@@ -506,7 +507,7 @@ export function createTarotSketch(opts: SketchOptions) {
         }
         p.pop();
       }
-      ctx.restore();
+      p.pop(); // 잘라내기(clip)·색 설정 원상복구
     }
 
     /** 좌우 화살표 + 페이지 점(●○○) */
@@ -595,14 +596,14 @@ export function createTarotSketch(opts: SketchOptions) {
      */
     function drawSlotBackdrop() {
       const ctx = p.drawingContext as CanvasRenderingContext2D;
-      ctx.save();
+      p.push(); // p5 push = 캔버스 save + p5 스타일 저장
       ctx.beginPath();
       ctx.rect(0, L.gridBottom, p.width, p.height - L.gridBottom);
       ctx.clip();
       ctx.globalAlpha = 0.22; // 전체를 옅게
       const R = Math.min(p.width * 0.42, (p.height - L.gridBottom) * 0.62);
       drawCelestialWheel(p, p.width / 2, L.slotCY, R, opts.reducedMotion ? 0 : p.millis());
-      ctx.restore();
+      p.pop(); // 잘라내기(clip)·색 설정 원상복구
 
       const placed = s.picked.filter((_, k) => !isFlying(k)).length;
       p.stroke(...PALETTE.gold, 150);

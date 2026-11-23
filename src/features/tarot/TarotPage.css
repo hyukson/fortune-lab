@@ -157,6 +157,13 @@
   gap: 8px;
 }
 
+/* 개발용 카드 미리보기의 닫기 버튼 */
+.tarot-preview-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+}
+
 @media (max-width: 600px) {
   .tarot-topics {
     grid-template-columns: 1fr;

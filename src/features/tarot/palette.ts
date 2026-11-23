@@ -16,6 +16,13 @@ export const PALETTE: Record<'bg' | 'card' | 'gold' | 'goldHover' | 'text' | 'su
   sub: [201, 181, 211], // --color-sub
 };
 
+/**
+ * 캔버스 글꼴. ⚠️ p5는 글꼴 이름에 띄어쓰기가 있으면 전체를 따옴표로 감싸서
+ * 'A, "B C"' 같은 목록이 깨집니다(글자 크기까지 무시됨) → 띄어쓰기 없이 적어야 합니다.
+ */
+export const CANVAS_FONT = 'Pretendard,system-ui,sans-serif'; // 본문용 (고딕)
+export const CANVAS_SERIF = 'Georgia,serif'; // 카드 번호·영어 이름용 (클래식한 세리프)
+
 /** 두 색 a, b를 t(0~1) 비율로 섞은 색 */
 export function mix(a: RGB, b: RGB, t: number): RGB {
   return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
