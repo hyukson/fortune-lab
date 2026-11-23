@@ -1,14 +1,17 @@
-// 전체 분석 흐름: 사진 → 손 찾기 → 손금 찾기 → 길이·곡률·연속성 → 판정
-import { LINE_KEYS, MAX_IMAGE_SIDE, MIN_PIECE_PIXELS, type LineKey } from './config';
+// 전체 분석 흐름: 사진 → 손 찾기 → 손금 찾기 → 길이·곡률·연속성 → 손 모양·손가락 → 판정·점수
+import { LINE_KEYS, MAX_IMAGE_SIDE, MIN_FINGER_RATIO, MIN_PIECE_PIXELS, type LineKey } from './config';
 import { detectHand, type HandInfo } from './handDetector';
+import { categorizeHand, measureHand, type HandCategories, type HandMetrics } from './handShape';
 import { measureMask, type Pt } from './lineMetrics';
-import { ModelMissingError, segmentPalmLines } from './lineSegmenter';
+import { ModelMissingError, segmentPalmLines, type SegmentResult } from './lineSegmenter';
+import { makePalmCrop } from './palmCrop';
 import {
   continuityCategory,
   curveCategory,
   lengthCategory,
   type LineCategories,
 } from './reading';
+import { computeScores, type Score } from './scores';
 
 export type LineResult = {
   key: LineKey;
@@ -24,9 +27,12 @@ export type PalmResult = {
   image: HTMLCanvasElement;
   hand: HandInfo;
   lines: LineResult[];
+  handMetrics: HandMetrics;
+  handCats: HandCategories;
+  scores: Score[];
 };
 
-export type AnalyzeErrorCode = 'no-hand' | 'model-missing' | 'unknown';
+export type AnalyzeErrorCode = 'no-hand' | 'fingers' | 'model-missing' | 'unknown';
 
 export class AnalyzeError extends Error {
   code: AnalyzeErrorCode;
@@ -35,6 +41,14 @@ export class AnalyzeError extends Error {
     this.code = code;
   }
 }
+
+/** 분석 단계 (스캔 화면 체크리스트와 같은 순서) */
+export const ANALYZE_STAGES = [
+  '손 특징점 21개 찾기',
+  '생명선 · 두뇌선 · 감정선 찾기',
+  '길이 · 곡률 · 연속성 재기',
+  '손 모양 · 손가락 비율 판정',
+] as const;
 
 /** 파일(사진)을 캔버스로 읽기 — 큰 사진은 MAX_IMAGE_SIDE에 맞게 줄임 */
 export async function fileToCanvas(file: Blob): Promise<HTMLCanvasElement> {
@@ -50,10 +64,10 @@ export async function fileToCanvas(file: Blob): Promise<HTMLCanvasElement> {
 
 export async function analyzePalm(
   image: HTMLCanvasElement,
-  onProgress: (message: string) => void,
+  onStage: (stage: number) => void = () => {},
 ): Promise<PalmResult> {
   // 1) 손 특징점 (손바닥 너비 = 길이 비교 기준)
-  onProgress('손을 찾고 있어요...');
+  onStage(0);
   let hand: HandInfo | null;
   try {
     hand = await detectHand(image);
@@ -62,17 +76,18 @@ export async function analyzePalm(
     throw new AnalyzeError('unknown', '손 인식 모델을 불러오지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.');
   }
   if (!hand) {
-    throw new AnalyzeError(
-      'no-hand',
-      '사진에서 손을 찾지 못했어요. 손바닥 전체가 화면에 나오게, 밝은 곳에서 다시 찍어 주세요.',
-    );
+    throw new AnalyzeError('no-hand', '사진에서 손을 찾지 못했어요.');
+  }
+  const handMetrics = measureHand(hand.points);
+  if (handMetrics.fingerRatio < MIN_FINGER_RATIO) {
+    throw new AnalyzeError('fingers', '손가락이 접혀 있는 것 같아요.');
   }
 
-  // 2) 손금 분할 모델
-  onProgress('손금을 찾고 있어요...');
-  let seg;
+  // 2)+3) 손금 분할 모델 → 선마다 길이·곡률·연속성 계산 → 판정
+  onStage(1);
+  let lines: LineResult[];
   try {
-    seg = await segmentPalmLines(image);
+    lines = await findLines(image, hand.points, hand.palmWidth, () => onStage(2));
   } catch (e) {
     if (e instanceof ModelMissingError) {
       throw new AnalyzeError(
@@ -84,18 +99,37 @@ export async function analyzePalm(
     throw new AnalyzeError('unknown', '손금 검출 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요.');
   }
 
-  // 3) 선마다 길이·곡률·연속성 계산 → 판정
-  onProgress('길이 · 곡률 · 연속성을 계산하고 있어요...');
-  const toImage = (p: Pt): Pt => ({ x: (p.x - seg.padX) / seg.scale, y: (p.y - seg.padY) / seg.scale });
+  // 4) 손 모양 · 손가락 판정 → 운세 지표 점수
+  onStage(3);
+  const handCats = categorizeHand(handMetrics);
+  const lineCats = Object.fromEntries(lines.filter((l) => l.cats).map((l) => [l.key, l.cats!]));
+  const scores = computeScores({ lines: lineCats, hand: handCats });
 
-  const lines: LineResult[] = LINE_KEYS.map((key) => {
+  return { image, hand, lines, handMetrics, handCats, scores };
+}
+
+/**
+ * 손금 3대 선 찾기 (사진 분석 · 카메라 촬영 전 확인 공용)
+ *  1) 손바닥만 크게 잘라 똑바로 세운 그림으로 먼저 찾고
+ *  2) 거기서 못 찾은 선이 있으면 사진 전체로 한 번 더 찾아서 채움
+ * 결과 좌표는 원본 사진 좌표, 길이 비율은 손바닥 너비 기준.
+ */
+export async function findLines(
+  image: HTMLCanvasElement,
+  points: Pt[],
+  palmWidth: number,
+  onSegmented: () => void = () => {},
+): Promise<LineResult[]> {
+  const crop = makePalmCrop(image, points);
+  const cropSeg = await segmentPalmLines(crop.canvas);
+  onSegmented();
+
+  const measure = (key: LineKey, seg: SegmentResult, toImage: (p: Pt) => Pt, pxPerImagePx: number) => {
     const mask = seg.masks[key];
     const m = mask ? measureMask(mask, seg.size, MIN_PIECE_PIXELS) : null;
-    if (!m) {
-      return { key, found: false, ratio: 0, straightness: 0, pieces: 0, paths: [], cats: null };
-    }
-    const ratio = m.length / seg.scale / hand.palmWidth;
-    return {
+    if (!m) return null;
+    const ratio = m.length / pxPerImagePx / palmWidth;
+    const result: LineResult = {
       key,
       found: true,
       ratio,
@@ -108,7 +142,28 @@ export async function analyzePalm(
         continuity: continuityCategory(m.pieces),
       },
     };
-  });
+    return result;
+  };
 
-  return { image, hand, lines };
+  // 잘라낸 그림 좌표 → 모델 입력 여백 보정 → 원본 사진 좌표
+  const fromCrop = (p: Pt) => crop.toImage({ x: (p.x - cropSeg.padX) / cropSeg.scale, y: (p.y - cropSeg.padY) / cropSeg.scale });
+  const found = new Map<LineKey, LineResult>();
+  for (const key of LINE_KEYS) {
+    const r = measure(key, cropSeg, fromCrop, cropSeg.scale * crop.scale);
+    if (r) found.set(key, r);
+  }
+
+  if (found.size < LINE_KEYS.length) {
+    const fullSeg = await segmentPalmLines(image);
+    const fromFull = (p: Pt) => ({ x: (p.x - fullSeg.padX) / fullSeg.scale, y: (p.y - fullSeg.padY) / fullSeg.scale });
+    for (const key of LINE_KEYS) {
+      if (found.has(key)) continue;
+      const r = measure(key, fullSeg, fromFull, fullSeg.scale);
+      if (r) found.set(key, r);
+    }
+  }
+
+  return LINE_KEYS.map(
+    (key) => found.get(key) ?? { key, found: false, ratio: 0, straightness: 0, pieces: 0, paths: [], cats: null },
+  );
 }
