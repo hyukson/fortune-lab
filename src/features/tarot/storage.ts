@@ -14,14 +14,14 @@ export const TOPIC_LABELS: Record<Topic, string> = {
 };
 
 /** 카드가 놓이는 3개의 자리 */
-export const POSITION_LABELS = ['과거', '현재', '조언'] as const;
+export const POSITION_LABELS = ['과거', '현재', '미래'] as const;
 
 /**
  * 진행 단계
  * - shuffle: 카드를 섞는 중 (아직 순서가 정해지지 않음)
  * - pick:    섞기 완료 → 순서·정역방향 확정, 3장 고르는 중
  * - reveal:  3장 다 골랐고, 한 장씩 뒤집는 중
- * - done:    3장 모두 뒤집음 (2차에서 결과 해석 화면으로 연결)
+ * - done:    3장 모두 뒤집음 → 해석 결과 화면(TarotResult.tsx)을 볼 수 있음
  */
 export type Phase = 'shuffle' | 'pick' | 'reveal' | 'done';
 
@@ -35,8 +35,8 @@ export type TarotSession = {
   phase: Phase;
   order: number[]; // 섞인 카드 순서 (카드 id 78개). shuffle 단계에서는 빈 배열
   reversed: boolean[]; // 카드 id별 역방향 여부 (78개). shuffle 단계에서는 빈 배열
-  picked: number[]; // 고른 카드 id (최대 3개, 고른 순서 = 과거·현재·조언)
-  flipped: boolean[]; // 자리별 뒤집힘 여부 [과거, 현재, 조언]
+  picked: number[]; // 고른 카드 id (최대 3개, 고른 순서 = 과거·현재·미래)
+  flipped: boolean[]; // 자리별 뒤집힘 여부 [과거, 현재, 미래]
 };
 
 const STORAGE_KEY = 'fortune-lab:tarot:session';

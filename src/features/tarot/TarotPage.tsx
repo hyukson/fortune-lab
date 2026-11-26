@@ -1,6 +1,6 @@
 // 담당: 장진영
-// 타로 페이지: ① 주제 선택(HTML) → ② 섞기·고르기·뒤집기(p5 전체화면 캔버스)
-// 산출 방식: 78장 덱에서 비복원 무작위 3장 + 정/역방향 → 위치(과거·현재·조언)별 해석 (해석은 2차에서 추가)
+// 타로 페이지: ① 주제 선택(HTML) → ② 섞기·고르기·뒤집기(p5 전체화면 캔버스) → ③ 해석 결과(HTML)
+// 산출 방식: 78장 덱에서 비복원 무작위 3장 + 정/역방향 → 위치(과거·현재·미래)·주제별 해석 (interpret.ts)
 //
 // [AI 사용 표시] 이 파일의 코드는 Claude(AI)가 함수 단위로 작성했습니다. (AI 사용 비율: 약 100%)
 
@@ -10,6 +10,8 @@ import PageLayout from '../../components/PageLayout';
 import P5Canvas from '../../components/P5Canvas';
 import { saveTarotResult } from '../chatbot/adapters/saveTarot';
 import { DECK } from './deck';
+import { interpretReading } from './interpret';
+import TarotResult from './TarotResult';
 import {
   POSITION_LABELS,
   TOPIC_LABELS,
@@ -41,6 +43,26 @@ function describeProgress(s: TarotSession): string {
   return '3장 모두 확인함';
 }
 
+/**
+ * (개발용) 주소 값으로 "3장을 다 뒤집은 가짜 세션"을 만드는 함수 → 결과 화면만 바로 확인할 때 사용
+ *   cards=카드 id 3개(0~77), rev=역방향 여부 3개(1이면 역방향), topic=love|money|career
+ * [AI 도움: Claude]
+ */
+function createPreviewSession(params: URLSearchParams): TarotSession {
+  const topicParam = params.get('topic');
+  const topic: Topic = topicParam === 'money' || topicParam === 'career' ? topicParam : 'love';
+  const ids = (params.get('cards') ?? '0,40,77').split(',').map((v) => Math.min(77, Math.max(0, Number(v) || 0)));
+  const revs = (params.get('rev') ?? '0,1,0').split(',').map((v) => v === '1');
+  const s = createSession(topic, params.get('q') ?? '');
+  s.order = DECK.map((c) => c.id);
+  s.reversed = DECK.map(() => false);
+  ids.forEach((id, k) => (s.reversed[id] = revs[k] ?? false));
+  s.picked = ids;
+  s.flipped = [true, true, true];
+  s.phase = 'done';
+  return s;
+}
+
 /** 사용자가 "동작 줄이기" 설정을 켰는지 확인 */
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -60,7 +82,8 @@ function exitFullscreen() {
 export default function TarotPage() {
   // 저장된 진행 상황이 있으면 불러와서 시작 (없으면 null)
   const [session, setSession] = useState<TarotSession | null>(() => loadSession());
-  const [view, setView] = useState<'select' | 'ritual'>('select'); // select=주제 선택 화면, ritual=카드 화면
+  // select=주제 선택 화면, ritual=카드 화면, result=해석 결과 화면
+  const [view, setView] = useState<'select' | 'ritual' | 'result'>('select');
   const [topic, setTopic] = useState<Topic>(session?.topic ?? 'love');
   const [question, setQuestion] = useState('');
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -136,6 +159,19 @@ export default function TarotPage() {
     setView('select');
   }
 
+  /** 카드 화면 → 해석 결과 화면 (3장을 모두 뒤집었을 때만 가능) */
+  function showResult() {
+    exitFullscreen();
+    setView('result');
+    window.scrollTo(0, 0);
+  }
+
+  /** 결과 화면 → 주제 선택 화면 (새 리딩을 고를 수 있게) */
+  function goToSelect() {
+    setView('select');
+    window.scrollTo(0, 0);
+  }
+
   /** 같은 주제로 처음부터 다시 섞기 */
   function restart() {
     if (!session) return;
@@ -147,6 +183,17 @@ export default function TarotPage() {
   function discard() {
     clearSession();
     setSession(null);
+  }
+
+  // ── (개발용) 결과 화면 미리보기: #/tarot?preview=result&cards=0,40,77&rev=0,1,0&topic=career ──
+  if (searchParams.get('preview') === 'result') {
+    const sample = createPreviewSession(searchParams);
+    const r = interpretReading(sample);
+    return (
+      <PageLayout title="타로 결과 (미리보기)" desc="개발용: 주소의 cards·rev·topic 값을 바꿔 확인">
+        {r && <TarotResult reading={r} onBackToCards={() => {}} onNewReading={() => {}} />}
+      </PageLayout>
+    );
   }
 
   // ── (개발용) 카드 디자인 미리보기 ──
@@ -176,6 +223,11 @@ export default function TarotPage() {
             {session.question && <span> · {session.question}</span>}
           </p>
           <div className="tarot-topbar-actions">
+            {session.phase === 'done' && (
+              <button type="button" className="btn tarot-topbar-result" onClick={showResult}>
+                해석 보기
+              </button>
+            )}
             <button type="button" className="tarot-ghost-btn" onClick={restart}>
               다시 섞기
             </button>
@@ -191,6 +243,16 @@ export default function TarotPage() {
           </div>
         </div>
       </div>
+    );
+  }
+
+  // ── ③ 해석 결과 화면 ──
+  const reading = session?.phase === 'done' ? interpretReading(session) : null;
+  if (view === 'result' && reading) {
+    return (
+      <PageLayout title="타로 결과" desc="세 장의 카드가 들려주는 이야기">
+        <TarotResult reading={reading} onBackToCards={resume} onNewReading={goToSelect} />
+      </PageLayout>
     );
   }
 
@@ -214,9 +276,15 @@ export default function TarotPage() {
             </ul>
           )}
           <div className="tarot-resume-actions">
-            <button type="button" className="btn" onClick={resume}>
-              이어서 하기
-            </button>
+            {reading ? (
+              <button type="button" className="btn" onClick={showResult}>
+                결과 보기
+              </button>
+            ) : (
+              <button type="button" className="btn" onClick={resume}>
+                이어서 하기
+              </button>
+            )}
             <button type="button" className="tarot-ghost-btn" onClick={discard}>
               기록 지우기
             </button>

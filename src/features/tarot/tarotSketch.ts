@@ -1,6 +1,6 @@
 // 담당: 장진영
 // 타로 리딩 화면 전체를 그리는 p5.js 스케치 (화면 전체 크기 캔버스)
-//   ① 섞기 애니메이션 → ② 78장을 여러 줄 + 페이지로 깔기 → ③ 3장 고르기(과거·현재·조언 자리로 날아감)
+//   ① 섞기 애니메이션 → ② 78장을 여러 줄 + 페이지로 깔기 → ③ 3장 고르기(과거·현재·미래 자리로 날아감)
 //   → ④ 한 장씩 뒤집기
 //
 // [AI 사용 표시] 이 파일의 코드는 Claude(AI)가 함수 단위로 작성했습니다. (AI 사용 비율: 약 100%)
@@ -44,7 +44,7 @@ type Layout = {
   gridTop: number; // 카드 영역(여백 포함) 시작 y
   gridBottom: number; // 카드 영역 끝 y = 아래쪽 자리 영역 시작
   pageStride: number; // 한 페이지 넘길 때 이동하는 거리(px)
-  slotW: number; // 과거·현재·조언 자리 카드 크기
+  slotW: number; // 과거·현재·미래 자리 카드 크기
   slotH: number;
   slotCY: number; // 자리 카드 중심 y
   slotXs: number[]; // 자리 카드 중심 x 3개
@@ -55,7 +55,7 @@ const CARD_RATIO = 1.62; // 카드 세로/가로 비율
 
 /**
  * 창 크기(w, h)에 맞춰 카드 크기·줄 수·페이지 수·자리 위치를 계산하는 함수.
- * 화면 위쪽 약 56%는 "깔린 카드", 아래쪽은 "과거·현재·조언 자리"로 씁니다.
+ * 화면 위쪽 약 56%는 "깔린 카드", 아래쪽은 "과거·현재·미래 자리"로 씁니다.
  * 카드가 너무 작아지지 않게 최소 크기를 두고, 한 화면에 다 안 들어가면 여러 페이지로 나눕니다.
  * [AI 도움: Claude] 배치 계산 작성
  */
@@ -87,7 +87,7 @@ export function computeLayout(w: number, h: number): Layout {
   const gridY = gridTop + (availH - usedH) / 2;
   const pageStride = cols * (cardW + gap);
 
-  // 아래쪽: 과거·현재·조언 자리 (위에 이름표, 아래에 카드 이름·안내 문구 공간)
+  // 아래쪽: 과거·현재·미래 자리 (위에 이름표, 아래에 카드 이름·안내 문구 공간)
   const labelH = 22;
   const nameH = 44;
   const hintH = 30;
@@ -112,7 +112,7 @@ const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
 type Star = { x: number; y: number; r: number; phase: number; speed: number };
-type Flight = { x: number; y: number; start: number }; // 깔린 자리 → 과거·현재·조언 자리로 날아가는 카드
+type Flight = { x: number; y: number; start: number }; // 깔린 자리 → 과거·현재·미래 자리로 날아가는 카드
 type Press = { x: number; y: number; scroll: number; dragging: boolean }; // 누르기 시작한 위치(드래그 판별용)
 
 /**
@@ -312,7 +312,7 @@ export function createTarotSketch(opts: SketchOptions) {
 
     /**
      * 깔린 카드 중 i번째를 고르는 함수.
-     * 고른 순서대로 과거 → 현재 → 조언 자리에 놓이고, 이미 고른 카드는 다시 고를 수 없습니다(비복원).
+     * 고른 순서대로 과거 → 현재 → 미래 자리에 놓이고, 이미 고른 카드는 다시 고를 수 없습니다(비복원).
      * [AI 도움: Claude]
      */
     function pickCard(i: number) {
@@ -327,7 +327,7 @@ export function createTarotSketch(opts: SketchOptions) {
     }
 
     /**
-     * slot번째 자리(0=과거, 1=현재, 2=조언)의 카드를 뒤집는 함수. 3장 다 뒤집으면 done 단계로.
+     * slot번째 자리(0=과거, 1=현재, 2=미래)의 카드를 뒤집는 함수. 3장 다 뒤집으면 done 단계로.
      * [AI 도움: Claude]
      */
     function flipCard(slot: number) {
@@ -448,7 +448,7 @@ export function createTarotSketch(opts: SketchOptions) {
       p.text('화면을 누르면 바로 섞기를 마쳐요', cx, p.height - 62);
     }
 
-    /** 점선 빈 칸 (이미 고른 카드 자리, 아직 비어 있는 과거·현재·조언 자리) */
+    /** 점선 빈 칸 (이미 고른 카드 자리, 아직 비어 있는 과거·현재·미래 자리) */
     function drawEmptyOutline(x: number, y: number, w: number, h: number, alpha: number) {
       const ctx = p.drawingContext as CanvasRenderingContext2D;
       p.noFill();
@@ -536,7 +536,7 @@ export function createTarotSketch(opts: SketchOptions) {
     }
 
     /**
-     * 과거·현재·조언 자리 3개 그리기 + 뒤집기 애니메이션.
+     * 과거·현재·미래 자리 3개 그리기 + 뒤집기 애니메이션.
      * 뒤집기 원리: 가로 크기를 cos 곡선으로 1 → 0 → 1로 바꾸면서,
      *   가운데(0이 되는 순간)를 지나면 뒷면 대신 앞면을 그립니다 → 3D로 도는 것처럼 보임.
      * [AI 도움: Claude]
@@ -589,7 +589,7 @@ export function createTarotSketch(opts: SketchOptions) {
     }
 
     /**
-     * 과거·현재·조언 자리 뒤 배경:
+     * 과거·현재·미래 자리 뒤 배경:
      *   ① 흐릿하게 도는 큰 천체 원판 (카드 영역 위로는 안 넘어가게 잘라냄)
      *   ② 고른 카드끼리 별자리처럼 금색 선으로 연결 + 선 가운데 작은 별
      * [AI 도움: Claude]
@@ -617,7 +617,7 @@ export function createTarotSketch(opts: SketchOptions) {
     }
 
     /**
-     * 고른 카드가 깔린 자리에서 과거·현재·조언 자리로 포물선을 그리며 날아가는 애니메이션
+     * 고른 카드가 깔린 자리에서 과거·현재·미래 자리로 포물선을 그리며 날아가는 애니메이션
      * [AI 도움: Claude]
      */
     function drawFlights() {
@@ -647,7 +647,7 @@ export function createTarotSketch(opts: SketchOptions) {
       } else if (s.phase === 'reveal') {
         msg = '카드를 눌러 한 장씩 뒤집어 보세요';
       } else if (s.phase === 'done') {
-        msg = '세 장을 모두 확인했어요 · 해석 화면은 다음 개발 단계에서 추가됩니다';
+        msg = '세 장을 모두 확인했어요 · 오른쪽 위 [해석 보기]를 눌러 보세요';
       }
       p.noStroke();
       p.fill(...PALETTE.gold);

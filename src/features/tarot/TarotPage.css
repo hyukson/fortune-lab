@@ -157,6 +157,142 @@
   gap: 8px;
 }
 
+/* 위쪽 줄의 "해석 보기" 버튼 (공통 .btn을 조금 작게) */
+.tarot-topbar-result {
+  padding: 8px 18px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* ── 해석 결과 화면 ── */
+.tarot-result {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0 4px;
+  background: var(--color-bg); /* 이미지로 저장할 때 배경이 투명해지지 않게 */
+}
+
+.tarot-result-head {
+  background: var(--color-card);
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+}
+.tarot-result-topic {
+  margin: 0 0 6px;
+  color: var(--color-sub);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+}
+.tarot-result-question {
+  margin: 0 0 12px;
+  color: var(--color-text);
+}
+.tarot-result-head h2 {
+  margin: 8px 0 12px;
+  color: var(--color-gold);
+  font-size: 1.25rem;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+.tarot-result-notes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-sub);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+
+.tarot-result-card {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  background: var(--color-card);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.tarot-result-art {
+  flex: none;
+  line-height: 0;
+}
+.tarot-result-art canvas {
+  border-radius: 10px;
+}
+.tarot-result-body {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+.tarot-result-body p {
+  margin: 0;
+}
+.tarot-result-pos {
+  color: var(--color-sub);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+}
+.tarot-result-body h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 8px;
+  font-size: 1.15rem;
+  color: var(--color-text);
+}
+.tarot-result-body h3 span {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: normal;
+}
+.tarot-result-body h3 .is-up {
+  border: 1px solid var(--color-gold);
+  color: var(--color-gold);
+}
+.tarot-result-body h3 .is-rev {
+  border: 1px solid var(--color-sub);
+  color: var(--color-sub);
+}
+
+.tarot-result-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+  color: var(--color-gold);
+  font-size: 0.85rem;
+}
+
+.tarot-result-action {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-left: 3px solid var(--color-gold);
+  border-radius: 8px;
+  background: var(--color-bg);
+}
+.tarot-result-action strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-gold);
+  font-size: 0.9rem;
+}
+
+.tarot-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 24px 0 8px;
+}
+
 /* 개발용 카드 미리보기의 닫기 버튼 */
 .tarot-preview-close {
   position: absolute;
@@ -178,5 +314,15 @@
   }
   .tarot-topbar-title {
     font-size: 0.85rem;
+  }
+  .tarot-topbar .tarot-topbar-result {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  /* 좁은 화면: 카드 그림을 위에, 글을 아래에 */
+  .tarot-result-card {
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
   }
 }
